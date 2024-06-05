@@ -1,0 +1,40 @@
+# Secure boot module signer.
+
+## Supported Software 
+
+- VMware Workstation/Player.
+
+## Features
+
+This script automates the signing and loading of the VMware modules when secure boot is enabled.
+It installs the necessary dependencies and then copies the sign-vmware-modules script to /etc/kernel/header\_postinst.d.
+The scripts inside that folder are ran every time a kernel header is installed.
+
+## Installation
+
+```
+chmod +x ./install.sh
+sudo ./install.sh
+```
+
+The installation should run automatically. If everything went well, you don't need to restart to run VMware. 
+
+The following steps are only required if new keys are generated manually (in that case you'll be asked for a password, write it down): 
+
+1) At boot, you'll get a blue screen that says "Enroll MOK". Then select "continue". 
+2) You'll be asked for a password, it is the one that you input previously. Hit enter, then select "Reboot".
+
+## How to update this script (if it was previously installed)
+
+1) Download sign-vmware-modules from this repo
+2) Run the following commands:
+
+```
+sudo mv sign-vmware-modules /etc/kernel/header_postinst.d/
+sudo chmod +x /etc/kernel/header_postinst.d/sign-vmware-modules
+```
+
+## Additional notes
+
+When upgrading VMware Workstation Player, the installation may finish correctly but if you check the logs, you'll see that the drivers couldn't be loaded.
+In which case, just run `/etc/kernel/header_postinst.d/sign-vmware-modules` once.

@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Modules that we intend to sign
+declare -a modules=("vmmon" "vmnet")
+
+GCC=/usr/bin/gcc-12
+
+# $1: apt provides as an argument the kernel version 
+# If we run the script in standalone mode, it uses the current kernel version 
+[ ! -z "$1" ] && last_installed_kernel_version=$1 || last_installed_kernel_version=$(uname -r)
+
+# Directory where VMware modules are stored 
+modules_path="/usr/lib/modules/$last_installed_kernel_version/misc" 
+
+# Directory where the set of generated private/public keys will be stored 
+custom_key_path="/root/signing"
+
+# Debian default public and private key for kernel module signing
+PUB_KEY=/var/lib/shim-signed/mok/MOK.der
+PRIV_KEY=/var/lib/shim-signed/mok/MOK.priv
+
+# if those don't exist, try using the custom ones that should have been created when install.sh was ran.
+if [ ! -f "$PUB_KEY" ] || [ ! -f "$PRIV_KEY" ] 
+then
+    PUB_KEY="$custom_key_path/VMware.der"
+    PRIV_KEY="$custom_key_path/VMware.priv"    
+    if [ ! -f "$PUB_KEY" ] || [ ! -f "$PRIV_KEY" ]; then
+        echo "Please create a public and private key pair to sign the modules"
+        exit 1
+    fi
+fi 
+
+echo "======================================================"
+
+for i in "${modules[@]}"
+do
+	echo "Compiling module $i"
+	vmware-modconfig --console --build-mod -k "$last_installed_kernel_version" "$i" "$GCC" &> /tmp/"$i"_build.log
+	echo "Signing module $i"
+	sudo /usr/src/linux-headers-$last_installed_kernel_version/scripts/sign-file sha256 "$PRIV_KEY" "$PUB_KEY" "$modules_path/$i.ko"
+done
+
+depmod -a "$last_installed_kernel_version"
+
+# Optional: Rebooting the VMware service so that it can load Modules without having to reboot
+
+echo "Loading modules...."
+
+[ "$last_installed_kernel_version" == $(uname -r) ] && systemctl restart vmware
+
+# Letting apt know that everything went well
+exit 0
