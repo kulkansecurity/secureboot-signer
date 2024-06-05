@@ -2,7 +2,7 @@
 
 ## Features
 
-This script automates the signing and loading of the VMware modules when secure boot is enabled.
+Making VMware player work while having Secure Boot enabled can be a bit of a hassle, because the kernel modules require to be manually signed each time the kernel (or VMware Player) is updated. This script automates the signing and loading of the VMware modules when secure boot is enabled.
 It installs the necessary dependencies and then copies the sign-vmware-modules script to /etc/kernel/header\_postinst.d.
 The scripts inside that folder are ran every time a kernel header is installed.
 
