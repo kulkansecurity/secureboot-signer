@@ -1,14 +1,21 @@
 # Secure boot module signer.
 
-## Supported Software 
-
-- VMware Workstation/Player.
-
 ## Features
 
 This script automates the signing and loading of the VMware modules when secure boot is enabled.
 It installs the necessary dependencies and then copies the sign-vmware-modules script to /etc/kernel/header\_postinst.d.
 The scripts inside that folder are ran every time a kernel header is installed.
+
+More on our blog at:
+
+- https://blog.kulkan.com/secure-boot-and-vmware-automating-kernel-module-signing-cbf01b0f62fe
+
+![secureboot-signer](screencapture1.png?raw=true "secureboot-signer")
+
+## Supported Software 
+
+- VMware Workstation/Player.
+
 
 ## Installation
 
